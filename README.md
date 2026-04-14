@@ -204,9 +204,9 @@ com.avega.taxgap
 
 ### 1. Clone Repository
 
-git clone https://github.com/Ravi-Khot/tax-gap-service.git
+git clone https://github.com/Ravi-Khot/tax-gap-service-final.git
 
-git clone https://github.com/Ravi-Khot/tax-gap-service     //repo link without .git anywhere, use:
+git clone https://github.com/Ravi-Khot/tax-gap-service-final     //repo link without .git anywhere, use:
 
 
 cd tax-gap-service
