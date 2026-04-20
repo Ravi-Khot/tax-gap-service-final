@@ -52,7 +52,10 @@ public class TransactionService {
 
             result.setTransactionId(req.getTransactionId());
 
-            record.setTransactionId(req.getTransactionId());
+         // set transactionId ONLY if valid
+            if (req.getTransactionId() != null && !req.getTransactionId().trim().isEmpty()) {
+                record.setTransactionId(req.getTransactionId());
+            }
             record.setCustomerId(req.getCustomerId());
             record.setAmount(req.getAmount());
             record.setTaxRate(req.getTaxRate());
@@ -112,7 +115,10 @@ public class TransactionService {
                 record.setValidationStatus(ValidationStatus.FAILURE);
                 record.setFailureReasonsJson(JsonUtil.toJson(failureReasons));
 
-                transactionRecordRepository.save(record);
+                // save only if transactionId is present
+                if (req.getTransactionId() != null && !req.getTransactionId().trim().isEmpty()) {
+                    transactionRecordRepository.save(record);
+                }
 
                 result.setValidationStatus("FAILURE");
                 result.setFailureReasons(failureReasons);

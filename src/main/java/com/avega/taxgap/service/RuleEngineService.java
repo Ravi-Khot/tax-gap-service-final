@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 import com.avega.taxgap.entity.ExceptionRecord;
 import com.avega.taxgap.entity.RuleDefinition;
 import com.avega.taxgap.entity.TransactionRecord;
+import com.avega.taxgap.enums.EventType;
 import com.avega.taxgap.enums.TransactionType;
 import com.avega.taxgap.enums.ValidationStatus;
 import com.avega.taxgap.repository.ExceptionRecordRepository;
 import com.avega.taxgap.repository.RuleDefinitionRepository;
 import com.avega.taxgap.repository.TransactionRecordRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class RuleEngineService {
@@ -30,6 +31,9 @@ public class RuleEngineService {
 
     @Autowired
     private TransactionRecordRepository transactionRecordRepository;
+    
+    @Autowired
+    private AuditLogService auditLogService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,6 +45,12 @@ public class RuleEngineService {
             if (!rule.getEnabled()) {
                 continue;
             }
+            // LOG RULE EXECUTION
+            auditLogService.log(
+                EventType.RULE_EXECUTION,
+                record.getTransactionId(),
+                "Executing rule: " + rule.getRuleName()
+            );
 
             switch (rule.getRuleType()) {
                 case HIGH_VALUE_TRANSACTION:
@@ -145,5 +155,11 @@ public class RuleEngineService {
                 .build();
 
         exceptionRepository.save(ex);
+        
+        auditLogService.log(
+                EventType.RULE_EXECUTION,
+                record.getTransactionId(),
+                "Rule triggered: " + rule.getRuleName() + " | Reason: " + message
+            );
     }
 }
