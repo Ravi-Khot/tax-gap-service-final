@@ -7,8 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.avega.taxgap.dto.CustomerExceptionCountDto;
 import com.avega.taxgap.dto.ExceptionResponseDto;
 import com.avega.taxgap.dto.ExceptionSummaryDto;
+import com.avega.taxgap.dto.FullExceptionSummaryDto;
+import com.avega.taxgap.dto.SeverityCountDto;
 import com.avega.taxgap.entity.ExceptionRecord;
 import com.avega.taxgap.enums.RuleType;
 import com.avega.taxgap.enums.Severity;
@@ -88,29 +91,29 @@ public class ExceptionService {
     }
     
     // Get full summary including total, severity-wise, and customer-wise exception counts
-    public com.avega.taxgap.dto.FullExceptionSummaryDto getFullExceptionSummary() {
+    public FullExceptionSummaryDto getFullExceptionSummary() {
 
         long totalExceptions = exceptionRecordRepository.count();
 
-        List<com.avega.taxgap.dto.SeverityCountDto> severityCounts =
+        List<SeverityCountDto> severityCounts =
                 exceptionRecordRepository.getExceptionCountBySeverity()
                         .stream()
-                        .map(obj -> com.avega.taxgap.dto.SeverityCountDto.builder()
+                        .map(obj ->SeverityCountDto.builder()
                                 .severity(obj[0].toString())
                                 .count((Long) obj[1])
                                 .build())
                         .toList();
 
-        List<com.avega.taxgap.dto.CustomerExceptionCountDto> customerCounts =
+        List<CustomerExceptionCountDto> customerCounts =
                 exceptionRecordRepository.getCustomerWiseExceptionCount()
                         .stream()
-                        .map(obj -> com.avega.taxgap.dto.CustomerExceptionCountDto.builder()
+                        .map(obj -> CustomerExceptionCountDto.builder()
                                 .customerId((String) obj[0])
                                 .count((Long) obj[1])
                                 .build())
                         .toList();
 
-        return com.avega.taxgap.dto.FullExceptionSummaryDto.builder()
+        return FullExceptionSummaryDto.builder()
                 .totalExceptions(totalExceptions)
                 .countBySeverity(severityCounts)
                 .customerWiseExceptionCount(customerCounts)
